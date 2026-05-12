@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
-
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4238015358081789"
+     crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -304,6 +305,12 @@
      → Remplace le contenu de ce div par ton code AdSense
      ══════════════════════════════════════════════════ -->
 <div class="ad-block" id="adStatic1">
+  <ins class="adsbygoogle"
+       style="display:block;width:100%;height:90px;"
+       data-ad-client="ca-pub-4238015358081789"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
 <section class="hero">
@@ -374,6 +381,12 @@
      → Remplace le contenu de ce div par ton code AdSense
      ══════════════════════════════════════════════════ -->
 <div class="ad-block" id="adStatic2" style="margin-top:0">
+  <ins class="adsbygoogle"
+       style="display:block;width:100%;height:90px;"
+       data-ad-client="ca-pub-4238015358081789"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
 <section class="pricing-section" id="tarifs">
@@ -486,9 +499,13 @@
          → Remplace le contenu de ce div par ton code AdSense
          L'id "adwallSlot" permet de changer le contenu par JS
          ══════════════════════════════════════════════════ -->
-    <!-- Emplacement pub Monetag (optionnel — le Direct Link s'ouvre dans un onglet) -->
     <div class="adwall-slot" id="adwallSlot">
-      <span class="adwall-slot-label" id="adSlotLabel">Publicité 1 / 3</span>
+      <ins class="adsbygoogle"
+           style="display:block;width:100%;min-height:120px;"
+           data-ad-client="ca-pub-4238015358081789"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <div style="padding:18px 24px 10px;">
@@ -512,7 +529,7 @@
       </div>
     </div>
     <div style="padding:16px 24px 24px;">
-      <button id="adBtn" onclick="handleAdBtn()" style="width:100%;padding:14px;background:#5b21b6;border:none;border-radius:10px;color:white;font-size:15px;font-weight:600;cursor:pointer;opacity:1;font-family:var(--font-body);transition:all .3s;">Voir la publicité →</button>
+      <button id="adBtn" onclick="nextAd()" disabled style="width:100%;padding:14px;background:#5b21b6;border:none;border-radius:10px;color:white;font-size:15px;font-weight:600;cursor:not-allowed;opacity:.45;font-family:var(--font-body);transition:all .3s;">Continuer →</button>
       <p id="adLabel" style="text-align:center;font-size:12px;color:rgba(255,255,255,.3);margin-top:10px;">Publicité 1 sur 3</p>
     </div>
   </div>
@@ -685,19 +702,19 @@ Retourne UNIQUEMENT les 3 bios séparées par "---", sans titre ni explication.`
 
   try {
     const res = await fetch('/.netlify/functions/generate', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ prompt })
-});
-const data = await res.json();
-const text = data.text || '';
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await res.json();
+    const text = data.text || '';
     const bios = text.split('---').map(b => b.trim()).filter(b => b).slice(0, 3);
     document.getElementById('loader').classList.remove('show');
     showResults(bios, limit);
   } catch(e) {
     document.getElementById('loader').classList.remove('show');
     document.getElementById('genForm').style.display = 'flex';
-    alert('Erreur : vérifie ta clé API et réessaie.');
+    alert('Erreur de génération. Réessaie dans quelques secondes.');
   }
 }
 
@@ -747,113 +764,86 @@ function resetForm() {
 }
 
 // ── AD WALL ─────────────────────────────────────────
-// URL de ton Direct Link Monetag
-const AD_URL = "https://omg10.com/4/10993883";
+let adN = 1, adStart = null, adOk = false;
+const AD_MIN = 2000;
 
-// adN = nombre de pubs VALIDÉES (0, 1, 2 ou 3)
-let adN = 0, adWatching = false, adTimerInterval = null;
-const AD_MIN = 2000; // 2 secondes minimum
-
-// ── Ouvre l'adwall (appelé par .trigger-ad)
 function openAd() {
-  adN = 0;
-  adWatching = false;
-  clearInterval(adTimerInterval);
   document.getElementById('adwall').style.display = 'flex';
-  document.getElementById('adBar').style.width = '0%';
-  document.getElementById('adPct').textContent = '0%';
-  updateAdWallUI();
+  adN = 1; adOk = false; updateAdDots(); startAdWatch();
 }
-
-// ── Ferme l'adwall et remet à zéro
 function closeAd() {
-  clearInterval(adTimerInterval);
   document.getElementById('adwall').style.display = 'none';
-  adN = 0; adWatching = false;
+  adN = 1; adOk = false; adStart = null;
   document.getElementById('adBar').style.width = '0%';
   document.getElementById('adPct').textContent = '0%';
+  lockAdBtn(); updateAdDots();
 }
-
-// ── Met à jour toute l'interface de l'adwall selon l'état actuel
-function updateAdWallUI() {
-  const b       = document.getElementById('adBtn');
-  const title   = document.getElementById('adTitle');
-  const sub     = document.getElementById('adSub');
-  const label   = document.getElementById('adLabel');
-  const slotLbl = document.getElementById('adSlotLabel');
-
-  // Mise à jour des pastilles de progression
-  for (let i = 1; i <= 3; i++) {
-    const d = document.getElementById('d' + i);
-    d.className = 'ad-dot-el';
-    if (i <= adN)          { d.classList.add('done');   d.textContent = '✓'; }
-    else if (i === adN+1)  { d.classList.add('active'); d.textContent = i;   }
-    else                   { d.textContent = i; }
-  }
-
-  if (slotLbl) slotLbl.textContent = `Publicité ${Math.min(adN+1, 3)} / 3`;
-
-  if (adN === 3) {
-    // ✅ Toutes les pubs validées → bouton final
-    title.textContent = 'Toutes les publicités validées ✓';
-    sub.textContent   = 'Cliquez pour accéder au générateur !';
-    label.textContent = 'Accès débloqué';
-    b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
-    b.textContent = 'Accéder au générateur →';
-
-  } else if (adWatching) {
-    // ⏳ Pub en cours — minuterie active
-    title.textContent = `Publicité ${adN+1} sur 3 en cours…`;
-    sub.textContent   = 'Restez au moins 2 secondes sur la publicité.';
-    label.textContent = `Publicité ${adN+1} sur 3`;
-    b.disabled = true; b.style.opacity = '.45'; b.style.cursor = 'not-allowed';
-    b.textContent = 'Patientez…';
-
-  } else {
-    // ▶️ Prêt à voir la prochaine pub
-    title.textContent = adN > 0 ? `Publicité ${adN} validée ✓` : '3 courtes publicités requises';
-    sub.textContent   = adN > 0
-      ? `Cliquez pour voir la publicité ${adN+1} sur 3.`
-      : 'Cliquez sur le bouton ci-dessous pour commencer.';
-    label.textContent = `Publicité ${adN+1} sur 3`;
-    b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
-    b.textContent = adN > 0 ? 'Continuer →' : 'Voir la publicité →';
-  }
+function lockAdBtn() {
+  const b = document.getElementById('adBtn');
+  b.disabled = true; b.style.opacity = '.45'; b.style.cursor = 'not-allowed'; b.textContent = 'Continuer →';
 }
+function unlockAdBtn() {
+  const b = document.getElementById('adBtn');
+  b.disabled = false; b.style.opacity = '1'; b.style.cursor = 'pointer';
+  document.getElementById('adTitle').textContent = adN < 3 ? 'Publicité validée ✓' : 'Toutes les publicités validées ✓';
+  document.getElementById('adSub').textContent = adN < 3 ? 'Cliquez sur Continuer pour la suivante.' : 'Cliquez sur Continuer pour accéder au générateur !';
+  b.textContent = adN < 3 ? 'Continuer →' : 'Accéder au générateur →';
+}
+function startAdWatch() {
+  adStart = Date.now(); adOk = false; lockAdBtn();
+  document.getElementById('adTitle').textContent = `Publicité ${adN} sur 3 en cours…`;
+  document.getElementById('adSub').textContent = 'Vous devez rester un minimum de 2 secondes sur la publicité.';
+  document.getElementById('adLabel').textContent = `Publicité ${adN} sur 3`;
 
-// ── Bouton principal de l'adwall
-function handleAdBtn() {
-  // Si on est en train d'attendre → rien
-  if (adWatching) return;
+  // ── Rafraîchit le slot publicitaire à chaque nouvelle pub ──
+  // Si tu utilises AdSense "auto ads", cette ligne n'est pas nécessaire.
+  // Si tu utilises des unités manuelles, tu peux appeler ici googletag.pubads().refresh()
+  refreshAdSlot(adN);
 
-  // Si les 3 pubs sont validées → ouvrir le formulaire
-  if (adN === 3) {
-    closeAd();
-    openFormModal();
-    return;
-  }
-
-  // Sinon : ouvrir la pub dans un nouvel onglet et démarrer le minuteur
-  window.open(AD_URL, "_blank");
-  adWatching = true;
-  const startTime = Date.now();
-  updateAdWallUI(); // verrouille le bouton
-
-  clearInterval(adTimerInterval);
-  adTimerInterval = setInterval(() => {
-    const elapsed = Date.now() - startTime;
-    // Barre de progression globale (sur les 3 pubs)
-    const pct = Math.round(((adN + Math.min(elapsed / AD_MIN, 1)) / 3) * 100);
+  const iv = setInterval(() => {
+    const e = Date.now() - adStart;
+    const pct = Math.round((((adN-1) + Math.min(e/AD_MIN,1)) / 3) * 100);
     document.getElementById('adBar').style.width = pct + '%';
     document.getElementById('adPct').textContent = pct + '%';
-
-    if (elapsed >= AD_MIN) {
-      clearInterval(adTimerInterval);
-      adN++;          // pub validée
-      adWatching = false;
-      updateAdWallUI(); // déverrouille et adapte le texte
-    }
+    if (e >= AD_MIN && !adOk) { adOk = true; clearInterval(iv); unlockAdBtn(); }
   }, 100);
+}
+
+// ── Fonction appelée à chaque pub (slot 1, 2 ou 3) ──
+// C'est ici que tu peux déclencher un refresh d'annonce
+function refreshAdSlot(n) {
+  // Exemple avec Google Ad Manager / GPT :
+  // googletag.cmd.push(function() { googletag.pubads().refresh([adSlot]); });
+
+  // Exemple avec AdSense display ads :
+  // (adsbygoogle = window.adsbygoogle || []).push({});
+
+  // Pour l'instant on met juste à jour le label du slot
+  const slot = document.getElementById('adwallSlot');
+  if (slot) {
+    const label = slot.querySelector('.adwall-slot-label');
+    if (label) label.textContent = `Publicité ${n} / 3`;
+  }
+}
+
+function nextAd() {
+  if (!adOk) return;
+  if (adN < 3) {
+    adN++; adOk = false; updateAdDots(); startAdWatch();
+  } else {
+    // ✅ CHANGEMENT CLÉ : ferme l'adwall et ouvre le formulaire en modal
+    closeAd();
+    openFormModal();
+  }
+}
+function updateAdDots() {
+  for (let i = 1; i <= 3; i++) {
+    const d = document.getElementById('d'+i);
+    d.className = 'ad-dot-el';
+    if (i < adN) { d.classList.add('done'); d.textContent = '✓'; }
+    else if (i === adN) { d.classList.add('active'); d.textContent = i; }
+    else d.textContent = i;
+  }
 }
 
 // ── TRIGGER AD sur tous les boutons .trigger-ad ──────
@@ -861,7 +851,5 @@ document.querySelectorAll('.trigger-ad').forEach(b => b.addEventListener('click'
   e.preventDefault(); openAd();
 }));
 </script>
-<div class="ad-block" id="adStatic3" style="margin-top: 20px; text-align: center; min-height: 100px;">
-    </div>
 </body>
 </html>
