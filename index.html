@@ -529,6 +529,7 @@
       </div>
     </div>
     <div style="padding:16px 24px 24px;">
+      <button id="retryBtn" onclick="retryAd()" style="width:100%;padding:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:rgba(255,255,255,0.6);font-size:13px;cursor:pointer;font-family:var(--font-body);margin-bottom:8px;display:none;">🔄 Revoir la publicité</button>
       <button id="adBtn" onclick="nextAd()" disabled style="width:100%;padding:14px;background:#5b21b6;border:none;border-radius:10px;color:white;font-size:15px;font-weight:600;cursor:not-allowed;opacity:.45;font-family:var(--font-body);transition:all .3s;">Continuer →</button>
       <p id="adLabel" style="text-align:center;font-size:12px;color:rgba(255,255,255,.3);margin-top:10px;">Publicité 1 sur 3</p>
     </div>
@@ -839,6 +840,7 @@ if (elapsed >= AD_MIN) {
   setBar(Math.round((adN / 3) * 100));
   document.getElementById('adTitle').textContent = 'Publicité validée ✓';
   document.getElementById('adTitle').style.color = ''; // ← remet couleur normale
+  document.getElementById('retryBtn').style.display = 'none';
 document.getElementById('adSub').textContent = adN < 3 ? 'Cliquez sur Continuer pour la suivante.' : 'Cliquez sur Continuer pour accéder au générateur !';  unlockAdBtn();
   adN++;
   updateAdDots();
@@ -851,11 +853,19 @@ document.getElementById('adSub').textContent = adN < 3 ? 'Cliquez sur Continuer 
   adWaiting = false;
   adLeaveTime = null;
   unlockAdBtn();
+  document.getElementById('retryBtn').style.display = 'block';
 }
     }
   }
 }
-
+function retryAd() {
+  window.open('https://omg10.com/4/10993883', '_blank');
+  adWaiting = true;
+  adLeaveTime = null;
+  document.getElementById('adTitle').textContent = `Publicité ${adN} sur 3 en cours…`;
+  document.getElementById('adTitle').style.color = '';
+  document.getElementById('adSub').textContent = 'Restez au moins 2 secondes sur la publicité puis revenez ici.';
+}
 function nextAd() {
   if (adOk) {
     // Pub déjà validée → passer à la suivante ou ouvrir le formulaire
@@ -865,7 +875,7 @@ function nextAd() {
       resetBar();
       updateAdDots();
       updateAdTexts();
-      lockAdBtn();
+      unlockAdBtn();
     } else {
       closeAd();
       openFormModal();
