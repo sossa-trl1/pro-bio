@@ -828,10 +828,11 @@ function refreshAdSlot(n) {
 
 function nextAd() {
   if (!adOk) return;
+  // ← Ouvre la pub Monetag dans un nouvel onglet
+  window.open('https://omg10.com/4/10993883', '_blank');
   if (adN < 3) {
     adN++; adOk = false; updateAdDots(); startAdWatch();
   } else {
-    // ✅ CHANGEMENT CLÉ : ferme l'adwall et ouvre le formulaire en modal
     closeAd();
     openFormModal();
   }
