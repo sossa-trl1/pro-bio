@@ -1,6 +1,8 @@
 {
   "name": "pro-bio",
   "version": "1.0.0",
+  "description": "Générateur de Bio avec OpenAI",
+  "main": "index.html",
   "dependencies": {
     "openai": "^4.0.0"
   }
