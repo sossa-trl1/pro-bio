@@ -777,7 +777,7 @@ function openAd() {
 
 function closeAd() {
   document.getElementById('adwall').style.display = 'none';
-  adN = 1; adOk = false; adWaiting = false; adLeaveTime = null;
+  adN = 1; adOk = false; adWaiting = false; adLeaveTime = null; unlockAdBtn();
   resetBar(); lockAdBtn(); updateAdDots();
   document.removeEventListener('visibilitychange', onVisibility);
 }
@@ -833,25 +833,25 @@ function onVisibility() {
     // L'user revient → on vérifie s'il est resté assez longtemps
     if (adWaiting && adLeaveTime) {
       const elapsed = Date.now() - adLeaveTime;
-      if (elapsed >= AD_MIN) {
-        // ✅ Pub validée
-        adOk = true;
-        adWaiting = false;
-        setBar(Math.round((adN / 3) * 100));
-        document.getElementById('adTitle').textContent = 'Publicité validée ✓';
-        document.getElementById('adSub').textContent = adN < 3 ? 'Cliquez sur Continuer pour la suivante.' : 'Cliquez sur Continuer pour accéder au générateur !';
-        unlockAdBtn();
-        // Le dot actuel passe en ✓, le suivant devient violet
-        adN++;
-        updateAdDots();
-        adN--; // on remet pour que nextAd() incrémente correctement
+if (elapsed >= AD_MIN) {
+  adOk = true;
+  adWaiting = false;
+  setBar(Math.round((adN / 3) * 100));
+  document.getElementById('adTitle').textContent = 'Publicité validée ✓';
+  document.getElementById('adTitle').style.color = ''; // ← remet couleur normale
+document.getElementById('adSub').textContent = adN < 3 ? 'Cliquez sur Continuer pour la suivante.' : 'Cliquez sur Continuer pour accéder au générateur !';  unlockAdBtn();
+  adN++;
+  updateAdDots();
+  adN--;
       } else {
-        // Pas assez longtemps
-        document.getElementById('adTitle').textContent = '⚠️ Trop rapide !';
-        document.getElementById('adSub').textContent = 'Restez au moins 2 secondes sur la publicité.';
-        adWaiting = false;
-        adLeaveTime = null;
-      }
+  // Pas assez longtemps
+  document.getElementById('adTitle').textContent = '⚠️ Trop rapide !';
+  document.getElementById('adTitle').style.color = '#ef4444';
+  document.getElementById('adSub').textContent = 'Restez au moins 2 secondes sur la publicité.';
+  adWaiting = false;
+  adLeaveTime = null;
+  unlockAdBtn();
+}
     }
   }
 }
@@ -877,7 +877,6 @@ function nextAd() {
     adLeaveTime = null;
     document.getElementById('adTitle').textContent = `Publicité ${adN} sur 3 en cours…`;
     document.getElementById('adSub').textContent = 'Restez au moins 2 secondes sur la publicité puis revenez ici.';
-    lockAdBtn();
   }
 }
 
