@@ -771,7 +771,7 @@ function openAd() {
   document.getElementById('adwall').style.display = 'flex';
   adN = 1; adOk = false; adWaiting = false;
   resetBar(); updateAdDots(); updateAdTexts();
-  lockAdBtn();
+  unlockAdBtn();
   document.addEventListener('visibilitychange', onVisibility);
 }
 
