@@ -771,7 +771,7 @@ const AD_MIN = 2000;
 function openAd() {
   document.getElementById('adwall').style.display = 'flex';
   adN = 1; adOk = false; adWaiting = false;
-  resetBar(); updateAdDots(); updateAdTexts();
+   updateAdDots(); updateAdTexts();
   unlockAdBtn();
   document.addEventListener('visibilitychange', onVisibility);
 }
@@ -779,7 +779,7 @@ function openAd() {
 function closeAd() {
   document.getElementById('adwall').style.display = 'none';
   adN = 1; adOk = false; adWaiting = false; adLeaveTime = null; unlockAdBtn();
-  resetBar(); lockAdBtn(); updateAdDots();
+   lockAdBtn(); updateAdDots();
   document.removeEventListener('visibilitychange', onVisibility);
 }
 
@@ -872,7 +872,7 @@ function nextAd() {
     adOk = false;
     if (adN < 3) {
       adN++;
-      resetBar();
+      
       updateAdDots();
       updateAdTexts();
       unlockAdBtn();
